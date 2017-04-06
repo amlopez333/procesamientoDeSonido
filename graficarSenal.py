@@ -6,25 +6,32 @@ from matplotlib.pyplot import figure, plot, show
 #constants
 a_0 = 1/4
 pi = np.pi
-samples = 100 #Samples to generate in interval for numpy linespace
+samples = 10 #Samples to generate in interval for numpy linespace
 def getAsubks(kMax):
-    return [abs((-1 + (-1)**k)/(pi*k)**2) for k in xrange(1, kMax)]
+    return [a_0] + [abs((-1 + (-1)**k)/(pi*k)**2) for k in range(1, kMax)]
 
 def getCosine(theta, k, t, f_0):
     return np.cos(2*pi*k*f_0*t + theta)
 
-def listToNPArray(list):
-    return np.array(list)
+def listToNPArray(array):
+    return np.array(array)
 
 def getIntervalSamples(Tmin, Tmax):
     return np.linspace(Tmin, Tmax, samples)
 def calculateFourierSeriesCoefs(kMax, theta, T, Tmin, Tmax):
     f_0 = 1/T;
     A = listToNPArray(getAsubks(kMax))
+    print(A)
     t_n = getIntervalSamples(Tmin, Tmax)
-    cosines = [getCosine(theta, k, t, f_0) for k in xrange(1, kMax)]
+    cosines = [1] + [getCosine(theta, k, t_n[0], f_0) for k in range(1, kMax)]
+    print(cosines)
     cosines = listToNPArray(cosines)
-    return A, cosines
+    return A, cosines, t_n
 
-print calculateFourierSeriesCoefs(10, pi, -1/2, 1)
 
+A, cosines, t_n = calculateFourierSeriesCoefs(10, pi, 1, -1/2,1/2)
+array = np.multiply(A, cosines)
+a = calculateFourierSeriesCoefs(10, pi, 1, -1/2,1/2)
+print(t_n)
+plot(t_n, array)
+show()
