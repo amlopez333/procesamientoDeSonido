@@ -1,37 +1,38 @@
 import numpy as np;
-from matplotlib.pyplot import figure, plot, show
+import matplotlib.pyplot as plt
 #signal function is as follows 
 #s(t) = 1/4 + sum((-1 + (-1)^k)/(pi*k)^2 cos(2pi*k*f_0*t + pi))
 
 #constants
 a_0 = 1/4
 pi = np.pi
-samples = 10 #Samples to generate in interval for numpy linespace
-def getAsubks(kMax):
-    return [a_0] + [abs((-1 + (-1)**k)/(pi*k)**2) for k in range(1, kMax)]
+samples = 100 #Samples to generate in interval for numpy linespace
 
-def getCosine(theta, k, t, f_0):
-    return np.cos(2*pi*k*f_0*t + theta)
+def getCks(kMax):
+    return [(-1 + (-1)**k)/2*(pi *k)**2 for k in xrange(1,kMax)]
 
-def listToNPArray(array):
-    return np.array(array)
+def complexToReal(cks):
+    A = 2*np.abs(cks)
+    theta = np.angle(cks)
+    return A, theta
 
-def getIntervalSamples(Tmin, Tmax):
-    return np.linspace(Tmin, Tmax, samples)
-def calculateFourierSeriesCoefs(kMax, theta, T, Tmin, Tmax):
-    f_0 = 1/T;
-    A = listToNPArray(getAsubks(kMax))
-    print(A)
-    t_n = getIntervalSamples(Tmin, Tmax)
-    cosines = [1] + [getCosine(theta, k, t_n[0], f_0) for k in range(1, kMax)]
-    print(cosines)
-    cosines = listToNPArray(cosines)
-    return A, cosines, t_n
+def graficar(A, theta, T, Tmin, Tmax):
+    t_n = np.linspace(Tmin, Tmax, samples)
+    f_0 = 1/T
+    s_t = [0.0]*samples
+    for i in range(samples):
+        for j in range(len(A)):
+            s_t[i] += A[j] * np.cos(2*pi*f_0*j*t_n[i] + theta)
+    plt.plot(t_n, s_t)
+    plt.show()
+    return t_n, s_t
 
+if __name__ == '__main__':
+    cks = getCks(10)
+    A, theta = complexToReal(cks)
+    t, s = graficar(A, theta, 1, -1/2, 1/2)
+    plt.plot(t,s)
+    plt.xlabel('Tiempo (s)')
+    plt.ylabel('Amplitud')
+    plt.show()
 
-A, cosines, t_n = calculateFourierSeriesCoefs(10, pi, 1, -1/2,1/2)
-array = np.multiply(A, cosines)
-a = calculateFourierSeriesCoefs(10, pi, 1, -1/2,1/2)
-print(t_n)
-plot(t_n, array)
-show()
